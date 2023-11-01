@@ -4,27 +4,27 @@ const Triangle = require('./lib/shapes')
 const Cirlce = require('./lib/shapes')
 const Square = require('./lib/shapes')
 
-function SVGLogo(userInput, shapeChoice) {
+function generateSVG(shapeType, text, textColor, shapeColor) {
 
     let shape;
-    switch(shapeChoice) {
-        case 'Triangle':
-            shape = new Triangle();
-            break;
+    switch (shapeType) {
+      case 'triangle':
+        shape = new Triangle();
+        break;
+      case 'circle':
+        shape = new Circle();
+        break;
+      case 'square':
+        shape = new Square();
+        break;
+      default:
+        console.log('Invalid shape type');
+        return;
+    }
 
-case 'Circle':
-    shape = new Circle();
-break;       
-case 'Square':
-    shape = new Square();
-break;
-default:
-console.error('Invalid shape choice');
-process.exit(1);
- }
+    shape.setColor(shapeColor);
 
- shape.setColor(userInput.shapeColor);
+    const svgInfo = shape.drawAsSVG(text, textColor);
 
- const svgInput = shape.drawAsSVG(userInput.text, userInput.textColor);
- return svgInput;
+    return svgInfo;
 }

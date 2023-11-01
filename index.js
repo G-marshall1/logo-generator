@@ -28,3 +28,8 @@ function generateSVG(shapeType, text, textColor, shapeColor) {
 
     return svgInfo;
 }
+
+function saveSVGFile(svgInfo) {
+    fs.writeFileSync('logo.svg', svgInfo, 'utf-8');
+    console.log('generated logo.svg');
+}

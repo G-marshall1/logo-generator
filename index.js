@@ -1,74 +1,89 @@
-const inquirer = require('inquirer');
+const inquirer = require("inquirer");
 const fs = require('fs')
-const Triangle = require('./lib/shapes')
-const Cirlce = require('./lib/shapes')
-const Square = require('./lib/shapes');
-const { userInfo } = require('os');
+const { Triangle, Circle, Square } = require('./lib/shapes');
 
-function generateSVG(shapeType, text, textColor, shapeColor) {
 
-    let shape;
-    switch (shapeType) {
-      case 'triangle':
-        shape = new Triangle();
-        break;
-      case 'circle':
-        shape = new Circle();
-        break;
-      case 'square':
-        shape = new Square();
-        break;
-      default:
-        console.log('Invalid shape type');
-        return;
+function writeToFile(fileName, answers) {
+
+    let shapeO = "";
+
+    shaperO = '<svg version="1.1" width="300" height="200" xmlns="http://www.w3.org/2000/svg">';
+
+    shapeO += "<g>";
+
+    shapeO += `${answers.shape}`;
+
+
+    let shapeImage;
+    if (answers.shape === "Triangle") {
+        shapeImage = new Triangle();
+        shapeO += `<polygon points="200,10 250,190 160,210" fill="${answers.shapeBackgroundColor}" />`;
+    } else if (answers.shape === "Circle") {
+        shapeImage = new Circle();
+        shapeO += `<circle cx="50" cy="50" r="40" fill="${answers.shapeBackgroundColor}" />`;
+    } else if (answers.shape === "Square") {
+        shapeImage = new Square();
+        shapeO += `<rect width="100" height="100" fill="${answers.shapeBackgroundColor}" />`;
     }
 
-    shape.setColor(shapeColor);
+    shapeO =+ `<text x="150" y="100" font-family="Verdana" font-size="20" fill="${answers.textColor}">${answers.text}</text>`;
 
-    const svgInfo = shape.drawAsSVG(text, textColor);
+    shapeO += "</g>";
 
-    return svgInfo;
+
+    shapeO += "</svg>";
+
+    fs.writeFile(fileName, shapeO, function (err) {
+        if (err) {
+            return console.log(err);
+        }
+
+        console.log("Success!");
+    }
+
+    );
+
 }
 
-function saveSVGFile(svgInfo) {
-    fs.writeFileSync('logo.svg', svgInfo, 'utf-8');
-    console.log('generated logo.svg');
-}
-
-inquirer
-.prompt([
-    {
-        type: 'input',
-        name: 'text',
-        massage: 'Please enter 3 charaters for the text',
-        validate: (input) => {
-            return input.length <= 3;
+function promptMe() {
+    inquirer.prompt([
+        {
+            type: "input",
+            message: "What is your name?",
+            name: "name"
         },
-    },
-    {
-        type:'input',
-        name: 'textColor',
-        message: 'Please enter a color or a hexadecimal number for the text',
-    },
-    {
-        type: 'input',
-        name: 'textColor',
-        message: 'What shape would you like?',
-        choices: ['Triangle', 'Circle', 'Square'],
-    },
-    {
-        type: 'input',
-        name: 'shapeColor',
-        message: 'Please enter color or hexadecimal number for the shape'
-    },
-])
-.then((userInput) => {
-    const {shape, text, textColor, shapeColor } = userInput;
+        {
+            type: "list",
+            message: "What shape would you like to use?",
+            name: "shape",
+            choices: ["Triangle", "Circle", "Square"]
+        },
+        {
+            type: "input",
+            message: "What is your favorite color?",
+            name: "shapeBackgroundColor"
+        },
+        {
+            type: "input",
+            message: "What is your favorite color for the text?",
+            name: "textColor"
+        },
+        {
+            type: "input",
+            message: "What would you like to say?",
+            name: "text"
+        },
+        {
+            type: "input",
+            message: "What is the name of your file?",
+            name: "fileName"
+        }
+    ]).then(function (answers) {
+        writeToFile(answers.fileName, answers);
+    })
+}
 
-    const svgInfo = generateSVG(shape, text, textColor, shapeColor);
+promptMe();
 
-    saveSVGFile(svgInfo);
-})
-.catch((error) => {
-    console.error('THIS NOT THE SVG YOU ARE LOOKING FOR! ITS', error );
-});
+
+
